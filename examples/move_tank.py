@@ -17,10 +17,10 @@ class MoveTank:
         self.tank = Tank(client, left_port, right_port)
 
     def move_forward(self):
-        self.tank.on_for_rotations(self.drive_speed, self.drive_speed, self.rotations)
+        self.tank.on_for_rotations(-self.drive_speed, -self.drive_speed, self.rotations)
 
     def move_backward(self):
-        self.tank.on_for_rotations(-self.drive_speed, -self.drive_speed, self.rotations)
+        self.tank.on_for_rotations(self.drive_speed, self.drive_speed, self.rotations)
 
     def turn_left(self):
         self.tank.on_for_rotations(self.turn_speed, -self.turn_speed, self.turn_rotations)
@@ -43,16 +43,20 @@ class MoveTank:
             self.rotations = self.rotations - 1
 
 class Monitor(threading.Thread):
-    def __init__(self, win, move_tank, refresh):
+    def __init__(self, win, move_tank, refresh, host, port):
         super().__init__()
         self.win = win
         self.refresh = refresh
         self.active = True
         self.move_tank = move_tank
+        self.host = host
+        self.port = port
 
-    def _status_screen(self, rotations, speed):
+    def _status_screen(self, rotations, speed, host, port):
         return """
-            keys:
+            host: {host}:{port}
+
+            control keys:
             
               arrow keys  - move tank with
               q           - quit
@@ -61,16 +65,26 @@ class Monitor(threading.Thread):
               +           - increase speed
               -           - decrease speed
             
-            rotations={0} | speed={1}
+            rotations={rotations} | speed={speed}
 
-        """.format(rotations, speed)
+        """.format(
+            host=host,
+            port=port,
+            rotations=rotations, 
+            speed=speed
+        )
 
     def run(self):
         while self.active:
             self.win.clear()
-            self.win.addstr(self._status_screen(
-                self.move_tank.rotations, 
-                self.move_tank.drive_speed))
+            self.win.addstr(
+                self._status_screen(
+                    self.move_tank.rotations, 
+                    self.move_tank.drive_speed,
+                    self.host,
+                    self.port
+                )
+            )
             time.sleep(self.refresh)
             
 
@@ -100,26 +114,13 @@ def control_loop(win, move_tank):
         except _curses.error:
             time.sleep(0.1)
 
-def main(win):
+def main(win, options):
     output_map = {
         'a': OUTPUT_A,
         'b': OUTPUT_B,
         'c': OUTPUT_C,
         'd': OUTPUT_D,
     }
-
-    parser = OptionParser()
-    parser.add_option("-R", "--refresh", dest="refresh", default=0.02, 
-        help="refresh after n seconds (default 0.02)")
-    parser.add_option("-r", "--right", dest="right", default='c', 
-        help="right output port a, b, c, d (default is c)")
-    parser.add_option("-l", "--left", dest="left", default='b', 
-        help="left output port a, b, c, d (default is b)")
-    parser.add_option("-H", "--host", dest="host", default='ev3dev.local', 
-        help="host (default is ev3dev.local)")
-    parser.add_option("-p", "--port", dest="port", default=9999, 
-        help="port (default is 9999)")
-    (options, _) = parser.parse_args()
 
     client = Client(host=options.host, port=int(options.port)) 
     mt = MoveTank(
@@ -129,7 +130,13 @@ def main(win):
     )
 
     win.nodelay(True)
-    dt = Monitor(win, mt,  float(options.refresh))
+    dt = Monitor(
+        win, 
+        mt, 
+        float(options.refresh), 
+        options.host, 
+        options.port
+    )
     dt.start()
     
     try:
@@ -141,4 +148,17 @@ def main(win):
         dt.active = False
         dt.join()         
 
-curses.wrapper(main)
+parser = OptionParser()
+parser.add_option("-R", "--refresh", dest="refresh", default=0.02, 
+    help="refresh after n seconds (default 0.02)")
+parser.add_option("-r", "--right", dest="right", default='c', 
+    help="right output port a, b, c, d (default is c)")
+parser.add_option("-l", "--left", dest="left", default='b', 
+    help="left output port a, b, c, d (default is b)")
+parser.add_option("-H", "--host", dest="host", default='ev3dev.local', 
+    help="host (default is ev3dev.local)")
+parser.add_option("-p", "--port", dest="port", default=9999, 
+    help="port (default is 9999)")
+(options, _) = parser.parse_args()
+
+curses.wrapper(main, (options))
