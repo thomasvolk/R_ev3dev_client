@@ -22,6 +22,7 @@ REV3_COMPLETER = WordCompleter([
     '#3',
     '#4',
     'tank',
+    'on_for_rotations',
     'color',
 ])
 
