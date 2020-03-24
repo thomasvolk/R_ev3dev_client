@@ -9,5 +9,6 @@ class InfraredSensor(object):
         r = self.__client.send('infrared {} on {}'.format(self.__ref, input_id))
         assert r == OK
 
-    def distance(self, channel=1):
-        return int(self.__client.send('infrared {} distance {}'.format(self.__ref, channel)))
+    def distance(self, channel=None):
+        channel_param = channel if channel else ''
+        return int(self.__client.send('infrared {} distance {}'.format(self.__ref, channel_param).strip()))
