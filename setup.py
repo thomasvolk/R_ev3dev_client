@@ -20,6 +20,8 @@ class RunClientCommand(Command):
         """Abstract method that is required to be overwritten"""
 
     def run(self):
+        import sys
+        sys.path.append('examples')
         from client_shell import REV3ClientShell
         print("open client host={} port={}".format(self.host, self.port))
         REV3ClientShell(

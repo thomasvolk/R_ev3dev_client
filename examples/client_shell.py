@@ -67,3 +67,18 @@ class REV3ClientShell(object):
                     break
                 else:
                     self._send(client, request)
+
+
+if __name__ == '__main__':
+    from optparse import OptionParser
+    parser = OptionParser()
+    parser.add_option("-H", "--host", dest="host", default='ev3dev.local',
+                      help="host (default is ev3dev.local)")
+    parser.add_option("-p", "--port", dest="port", default=9999,
+                      help="port (default is 9999)")
+    (options, _) = parser.parse_args()
+    print("open client host={} port={}".format(options.host, options.port))
+    REV3ClientShell(
+        host=options.host,
+        port=int(options.port),
+        buffer_size=2048).run()

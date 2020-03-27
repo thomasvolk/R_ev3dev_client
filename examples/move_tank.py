@@ -148,6 +148,7 @@ def main(win, options):
         dt.active = False
         dt.join()         
 
+
 parser = OptionParser()
 parser.add_option("-R", "--refresh", dest="refresh", default=0.02, 
     help="refresh after n seconds (default 0.02)")
