@@ -60,9 +60,15 @@ class UnknownResponse(Exception):
         )
 
 
+class ConnectionClosed(Exception):
+    """ connection close by the server """
+
+
 class Client(SimpleSocketClient):
     def send(self, msg):
         response = super().send(msg).strip()
+        if not response:
+            raise ConnectionClosed()
         if response.startswith('error'):
             _, origin, msg = response.split(' ', 2)
             raise RemoteError(origin, msg)

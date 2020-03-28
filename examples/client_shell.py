@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import R_ev3dev_client
-from R_ev3dev_client.client import RemoteError
+from R_ev3dev_client.client import RemoteError, ConnectionClosed
 from prompt_toolkit import PromptSession
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
@@ -12,7 +12,7 @@ CMD_EXIT = 'exit'
 REV3_COMPLETER = WordCompleter([
     CMD_EXIT,
     'hello',
-    'on',
+    'close',
     '#A',
     '#B',
     '#C',
@@ -21,9 +21,10 @@ REV3_COMPLETER = WordCompleter([
     '#2',
     '#3',
     '#4',
-    'tank',
+    'on',
     'on_for_rotations',
     'color',
+    'tank',
     'medium_motor'
 ])
 
@@ -41,10 +42,13 @@ class REV3ClientShell(object):
         try:
             response = client.send(request)
             print("[ev3] {}".format(response))
+        except ConnectionClosed:
+            return False
         except RemoteError as e:
             print("[ev3] {}".format(e))
         except Exception as e:
             print("[client] {} - {}".format(e.__class__.__name__, e))
+        return True
 
     def run(self):
         prompt_session = PromptSession(
@@ -54,10 +58,11 @@ class REV3ClientShell(object):
         )
         client = R_ev3dev_client.client(self.__host, self.__port, buffer_size=self.__buffer_size)
         with client:
-            while True:
+            connected = True
+            while connected:
                 try:
                     request = prompt_session.prompt('[client] > ').strip()
-                    if not request:
+                    if not request or request.startswith('#'):
                         continue
                     if request == CMD_EXIT:
                         break
@@ -66,7 +71,7 @@ class REV3ClientShell(object):
                 except EOFError:
                     break
                 else:
-                    self._send(client, request)
+                    connected = self._send(client, request)
 
 
 if __name__ == '__main__':
