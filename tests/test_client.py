@@ -1,5 +1,5 @@
 import unittest
-from R_ev3dev_client.client import Client, RemoteError, UnknownResponse, OK
+from R_ev3dev_client.client import Client, RemoteError, UnknownResponse, OK, ConnectionClosed
 from socket_mock import MockServerSocketModule
 
 
@@ -11,6 +11,13 @@ class TestClient(unittest.TestCase):
             r = client.send('hello')
             self.assertEqual(r, OK)
             self.assertEqual(str(r), 'Ok')
+
+    def test_connection_closed(self):
+        sf = MockServerSocketModule()
+        sf.add_response('close', '')
+        client = Client('test_client', 99999, socket_lib=sf)
+        with client:
+            self.assertRaises(ConnectionClosed, client.send, 'close')
 
     def test_remote_error(self):
         sf = MockServerSocketModule()
