@@ -11,6 +11,8 @@ CMD_EXIT = 'exit'
 
 REV3_COMPLETER = WordCompleter([
     CMD_EXIT,
+    'help',
+    'version',
     'hello',
     'close',
     '#A',
