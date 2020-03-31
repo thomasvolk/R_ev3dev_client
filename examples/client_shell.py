@@ -27,7 +27,9 @@ REV3_COMPLETER = WordCompleter([
     'on_for_rotations',
     'color',
     'tank',
-    'medium_motor'
+    'medium_motor',
+    'list_sensors',
+    'list_motors'
 ])
 
 
