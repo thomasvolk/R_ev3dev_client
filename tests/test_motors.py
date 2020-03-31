@@ -2,7 +2,7 @@ import unittest
 from R_ev3dev_client.client import Client
 from R_ev3dev_client.motor.tank import Tank
 from R_ev3dev_client.motor.motor import LargeMotor, MediumMotor
-from R_ev3dev_client.motor import OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D
+from R_ev3dev_client.motor import OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D, list_motors
 from socket_mock import MockServerSocketModule
 
 
@@ -37,3 +37,19 @@ class TestMediumeMotor(unittest.TestCase):
         with client:
             mm = MediumMotor(client, OUTPUT_B, ref='1')
             mm.on_for_rotations(2, 8)
+
+
+class TestListMotors(unittest.TestCase):
+    def test_list_motors(self):
+        sf = MockServerSocketModule()
+        sf.add_response('list_motors',
+                        '''value json [
+                            {"address": "ev3-ports:outA", "driver_name": "lego-ev3-l-motor"},
+                             {"address": "ev3-ports:outC", "driver_name": "lego-ev3-m-motor"}
+                        ]'''
+        )
+        client = Client('test_client', 99999, socket_lib=sf)
+        with client:
+            motors = list_motors(client)
+            self.assertEqual(2, len(motors))
+            self.assertEqual('ev3-ports:outA', motors[0]['address'])

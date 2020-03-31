@@ -2,7 +2,7 @@ import unittest
 from R_ev3dev_client.client import Client
 from R_ev3dev_client.sensor.color import ColorSensor
 from R_ev3dev_client.sensor.infrared import InfraredSensor
-from R_ev3dev_client.sensor import INPUT_1
+from R_ev3dev_client.sensor import INPUT_1, list_sensors
 from socket_mock import MockServerSocketModule
 
 
@@ -28,3 +28,19 @@ class TestInfrared(unittest.TestCase):
             ir = InfraredSensor(client, INPUT_1, ref='1')
             self.assertEqual(ir.distance(1), 56)
             self.assertEqual(ir.distance(), 23)
+
+
+class TestListSensors(unittest.TestCase):
+    def test_list_sensors(self):
+        sf = MockServerSocketModule()
+        sf.add_response('list_sensors',
+                        '''value json [
+                            {"address": "ev3-ports:in3", "driver_name": "lego-ev3-gyro"},
+                             {"address": "ev3-ports:in1", "driver_name": "lego-ev3-ir"}
+                        ]'''
+        )
+        client = Client('test_client', 99999, socket_lib=sf)
+        with client:
+            motors = list_sensors(client)
+            self.assertEqual(2, len(motors))
+            self.assertEqual('ev3-ports:in3', motors[0]['address'])
