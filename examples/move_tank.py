@@ -42,6 +42,7 @@ class MoveTank:
         if self.rotations >= 1:
             self.rotations = self.rotations - 1
 
+
 class Monitor(threading.Thread):
     def __init__(self, win, move_tank, refresh, host, port):
         super().__init__()
