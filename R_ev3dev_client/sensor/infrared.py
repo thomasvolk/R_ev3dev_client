@@ -11,4 +11,4 @@ class InfraredSensor(object):
 
     def distance(self, channel=None):
         channel_param = channel if channel else ''
-        return int(self.__client.send('infrared {} distance {}'.format(self.__ref, channel_param).strip()))
+        return self.__client.send('infrared {} distance {}'.format(self.__ref, channel_param).strip())

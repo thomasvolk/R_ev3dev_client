@@ -1,10 +1,12 @@
 import socket
 import json
 
+
 VALUE_TYPE_CONVERTER = {
     'int': lambda v: int(v),
     'float': lambda v: float(v),
     'str': lambda v: str(v).strip(),
+    'boolean': lambda v: v.strip().lower() == 'true',
     'json': lambda v: json.loads(v)
 }
 
