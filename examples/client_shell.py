@@ -32,7 +32,8 @@ REV3_COMPLETER = WordCompleter([
     'tank',
     'medium_motor',
     'list_sensors',
-    'list_motors'
+    'list_motors',
+    'run_in_background'
 ])
 
 
