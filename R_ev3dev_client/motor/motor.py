@@ -1,18 +1,16 @@
 import uuid
 from R_ev3dev_client.client import OK
+from R_ev3dev_client.motor import MotorBase
 
 
-class Motor(object):
+class Motor(MotorBase):
     def __init__(self, motor_type, client, motor_port, ref=str(uuid.uuid4())):
-        self.__ref = ref
-        self.__client = client
-        self.__motor_type = motor_type
-        r = self.__client.send('{} {} on {}'.format(self.__motor_type, self.__ref, motor_port))
+        super().__init__(client, motor_type, ref)
+        r = self.send_command('on {}'.format(motor_port))
         assert r == OK
 
     def on_for_rotations(self, speed,  rotations):
-        r = self.__client.send('{} {} on_for_rotations {} {}'.format(
-                                self.__motor_type, self.__ref, speed, rotations))
+        r = self.send_command('on_for_rotations {} {}'.format(speed, rotations))
         assert r == OK
 
 

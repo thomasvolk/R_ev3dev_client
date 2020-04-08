@@ -11,10 +11,14 @@ class TestTank(unittest.TestCase):
         sf = MockServerSocketModule()
         sf.add_response('tank 1 on #C #D', 'ok')
         sf.add_response('tank 1 on_for_rotations 2 2 8', 'ok')
+        sf.add_response('tank 1 run_in_background', 'value boolean false')
+        sf.add_response('tank 1 run_in_background True', 'ok')
         client = Client('test_client', 99999, socket_lib=sf)
         with client:
             t = Tank(client, OUTPUT_C, OUTPUT_D, ref='1')
             t.on_for_rotations(2, 2, 8)
+            self.assertFalse(t.run_in_background)
+            t.set_run_in_background(True)
 
 
 class TestLargeMotor(unittest.TestCase):
