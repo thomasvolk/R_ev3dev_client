@@ -3,6 +3,8 @@ import time, curses, threading
 from optparse import OptionParser
 from R_ev3dev_client.client import Client
 from R_ev3dev_client.motor.tank import Tank
+from R_ev3dev_client.motor import list_motors
+from R_ev3dev_client.sensor import list_sensors
 from R_ev3dev_client.motor import OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D
 import _curses
 
@@ -100,8 +102,7 @@ def control_loop(win, move_tank):
             '*': move_tank.inc_rotations,
             '_': move_tank.dec_rotations
         }
-    key=''
-    while True:   
+    while True:
         try:       
             key = win.getkey()                  
             if key == 'q':
@@ -114,6 +115,7 @@ def control_loop(win, move_tank):
                     win.addstr("  unknown key: " + str(key)) 
         except _curses.error:
             time.sleep(0.1)
+
 
 def main(win, options):
     output_map = {
@@ -151,16 +153,11 @@ def main(win, options):
 
 
 parser = OptionParser()
-parser.add_option("-R", "--refresh", dest="refresh", default=0.02, 
-    help="refresh after n seconds (default 0.02)")
-parser.add_option("-r", "--right", dest="right", default='c', 
-    help="right output port a, b, c, d (default is c)")
-parser.add_option("-l", "--left", dest="left", default='b', 
-    help="left output port a, b, c, d (default is b)")
-parser.add_option("-H", "--host", dest="host", default='ev3dev.local', 
-    help="host (default is ev3dev.local)")
-parser.add_option("-p", "--port", dest="port", default=9999, 
-    help="port (default is 9999)")
-(options, _) = parser.parse_args()
+parser.add_option("-R", "--refresh", dest="refresh", default=0.02, help="refresh after n seconds (default 0.02)")
+parser.add_option("-r", "--right", dest="right", default='c', help="right output port a, b, c, d (default is c)")
+parser.add_option("-l", "--left", dest="left", default='b', help="left output port a, b, c, d (default is b)")
+parser.add_option("-H", "--host", dest="host", default='ev3dev.local', help="host (default is ev3dev.local)")
+parser.add_option("-p", "--port", dest="port", default=9999, help="port (default is 9999)")
+(opts, _) = parser.parse_args()
 
-curses.wrapper(main, (options))
+curses.wrapper(main, opts)
