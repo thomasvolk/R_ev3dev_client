@@ -31,6 +31,8 @@ REV3_COMPLETER = WordCompleter([
     'gyro',
     'tank',
     'bg',
+    'sleep',
+    'speak',
     'medium_motor',
     'large_motor',
     'list_sensors',
