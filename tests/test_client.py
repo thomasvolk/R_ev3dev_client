@@ -64,3 +64,12 @@ class TestClient(unittest.TestCase):
         with client:
             r = client.send('test_value')
             self.assertEqual(r, 1)
+
+    def test_background(self):
+        sf = MockServerSocketModule()
+        client = Client('test_client', 99999, socket_lib=sf)
+        client.run_in_background = True
+        with client:
+            r = client.send('hello')
+            self.assertEqual(r, OK)
+            self.assertEqual(str(r), 'Ok')

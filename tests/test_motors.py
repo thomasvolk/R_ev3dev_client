@@ -18,7 +18,7 @@ class TestTank(unittest.TestCase):
             t = Tank(client, OUTPUT_C, OUTPUT_D, ref='1')
             t.on_for_rotations(2, 2, 8)
             self.assertFalse(t.run_in_background)
-            t.set_run_in_background(True)
+            t.run_in_background = True
 
 
 class TestLargeMotor(unittest.TestCase):

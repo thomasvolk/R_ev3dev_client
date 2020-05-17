@@ -69,13 +69,23 @@ class ConnectionClosed(Exception):
 
 
 class Client(SimpleSocketClient):
+    BACKGROUND_COMMAND = 'bg'
+
+    def __init__(self, host, port, buffer_size=2048, socket_lib=socket, 
+                 run_in_background=False):
+        super().__init__(host, port, buffer_size=buffer_size, socket_lib=socket_lib)
+        self.run_in_background = run_in_background
+
     def send(self, msg):
-        response = super().send(msg).strip()
+        command = msg
+        if self.run_in_background:
+            command = "{} {}".format(self.BACKGROUND_COMMAND, command)
+        response = super().send(command).strip()
         if not response:
             raise ConnectionClosed()
         if response.startswith('error'):
-            _, origin, msg = response.split(' ', 2)
-            raise RemoteError(origin, msg)
+            _, origin, message = response.split(' ', 2)
+            raise RemoteError(origin, message)
         elif response == 'ok':
             return OK
         elif response.startswith('value'):

@@ -24,7 +24,8 @@ class MotorBase(object):
     def run_in_background(self):
         return self.send_command('run_in_background')
 
-    def set_run_in_background(self, val):
+    @run_in_background.setter
+    def run_in_background(self, val):
         b_val = True if val else False
         r = self.send_command('run_in_background {}'.format(b_val))
         assert r == OK
