@@ -1,7 +1,7 @@
 R_ev3dev_client
 ===============
 
-R_ev3dev_client is the client library for the socket server R_ev3dev.
+R_ev3dev_client is the client library for the socket server [R_ev3dev](https://github.com/thomasvolk/R_ev3dev).
 
 quick start
 -----------
